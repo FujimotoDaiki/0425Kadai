@@ -26,8 +26,8 @@ public class UriageSyukei {
 
 				siten.put(items[0], items[1]);  //items[0]支店コード, items[1]支店名、を格納
 //				for(int i =0; i < items.length; i++) {
-					System.out.println(items[0] + "," + items[1]);
-					System.out.println(siten.get(items[0]));
+//					System.out.println(items[0] + "," + items[1]);
+//					System.out.println(siten.get(items[0]));
 //				}
 				String str = items[0];
 
@@ -62,8 +62,8 @@ public class UriageSyukei {
 
 				syohin.put(item[0], item[1]);  //item[0]商品コード, item[1]商品名、を格納
 //				for(int i =0; i < items.length; i++) {
-					System.out.println(item[0] + "," + item[1]);
-					System.out.println(syohin.get(item[0]));
+//					System.out.println(item[0] + "," + item[1]);
+//					System.out.println(syohin.get(item[0]));
 //				}
 				String str = item[0];
 
@@ -85,12 +85,35 @@ public class UriageSyukei {
 		File file = new File(args[0]);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
-		Object obj = "files";
-		String str = (String)obj;  //オブジェクト型をストリング型に変換
-
 		for(int i = 0; i < files.length; i++) {
-			if(str.endsWith(".rcd")) {  //接尾語が.rcdと一致
-				System.out.println(files[i]);
+			if(files[i].getName().endsWith(".rcd")) {  //接尾語が.rcdと一致
+				String[] item = files[i].getName().toString().split("\\.");  //[C:\Kadai]の表示なし、文字列を.で区切る
+
+				int j = Integer.parseInt(item[0]);  //文字列を数値に変換
+
+				if(j - 1 == i) {
+				//System.out.println(j);
+				} else {
+					System.out.println("売上ファイル名が連番になっていません");
+					return;
+				}
+
+				File file1 =new File(item.toString());
+				File file2[] = file1.listFiles();
+				System.out.println(file2);
+
+				HashMap<String, String> uriage = new HashMap<String, String>(); //マップオブジェクト生成
+				try {
+					File fl = new File(item[i]);
+					FileReader filereader = new FileReader(fl);
+					BufferedReader br = new BufferedReader(filereader);
+
+					String line;
+
+					while ((line = br.readLine()) != null) {  //文字列データの受け取り
+						String[] items = line.split("");
+					}
+				}
 			}
 		}
 	}
