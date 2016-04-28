@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class UriageSyukei {
 	public static void main(String[] args) {
+		HashMap<String, Long> uriagesum = new HashMap<String, Long>(); //マップオブジェクト生成
 //1.支店定義ファイル読み込み
-
 		//if(args.length != 1)
 		HashMap<String, String> siten = new HashMap<String, String>(); //マップオブジェクト生成(名前)
 		try {
@@ -23,12 +24,13 @@ public class UriageSyukei {
 
 			while ((line = br.readLine()) != null) {  //文字列データの受け取り
 				String[] items = line.split(",");  //カンマで分ける
-
+//				System.out.println(items[0]);
 				siten.put(items[0], items[1]);  //items[0]支店コード, items[1]支店名、を格納
-//				for(int i =0; i < items.length; i++) {
+//				System.out.println(siten.get(items[0]));
+
+				for(int i =0; i < items.length; i++) {
 //					System.out.println(items[0] + "," + items[1]);
-//					System.out.println(siten.get(items[0]));
-//				}
+				}
 				String str = items[0];
 
 				Pattern p = Pattern.compile("^\\d{3}$");  //半角数値3桁にマッチ
@@ -85,6 +87,7 @@ public class UriageSyukei {
 		File file = new File(args[0]);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
+		ArrayList<File> uriage = new ArrayList<File>();
 		for(int i = 0; i < files.length; i++) {
 			if(files[i].getName().endsWith(".rcd")) {  //接尾語が.rcdと一致
 				String[] item = files[i].getName().toString().split("\\.");  //[C:\Kadai]の表示なし、文字列を.で区切る
@@ -97,24 +100,34 @@ public class UriageSyukei {
 					System.out.println("売上ファイル名が連番になっていません");
 					return;
 				}
-
-				File file1 =new File(item.toString());
-				File file2[] = file1.listFiles();
-				System.out.println(file2);
-
-				HashMap<String, String> uriage = new HashMap<String, String>(); //マップオブジェクト生成
-				try {
-					File fl = new File(item[i]);
-					FileReader filereader = new FileReader(fl);
-					BufferedReader br = new BufferedReader(filereader);
-
-					String line;
-
-					while ((line = br.readLine()) != null) {  //文字列データの受け取り
-						String[] items = line.split("");
-					}
-				}
+				uriage.add(files[i]);
 			}
 		}
+		try {
+			for(int k = 0; k < uriage.size(); k++) {
+				File String = new File(uriage.get(k).toString());
+				FileReader filereader = new FileReader(String);
+				BufferedReader br = new BufferedReader(filereader);
+				String line;
+
+				ArrayList<String> nakami = new ArrayList<String>();
+				while ((line = br.readLine()) != null) {  //文字列データの受け取り
+					nakami.add(line);
+				}
+//				System.out.println(nakami.get(0));
+//				System.out.println(nakami.get(1));
+//				System.out.println(nakami.get(2));
+
+				br.close();
+				filereader.close();
+			}
+		} catch (FileNotFoundException e) {
+				System.out.println("商品定義ファイルが存在しません");
+				return;
+		} catch (IOException e) {
+				System.out.println("商品定義ファイルのフォーマットが不正です");
+				return;
+		}
+//		System.out.println(uriage);
 	}
 }
