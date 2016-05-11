@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 public class CalculateSystem {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-
 		if(args.length != 1) {
 			System.out.println("予期せぬエラーが発生しました");
 			return;
