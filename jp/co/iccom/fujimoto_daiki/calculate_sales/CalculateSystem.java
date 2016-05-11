@@ -54,7 +54,7 @@ public class CalculateSystem {
 				String str = items[0];
 
 				Pattern p = Pattern.compile("^\\d{3}$");  //半角数値3桁にマッチ
-		        Matcher m = p.matcher(str);
+				Matcher m = p.matcher(str);
 				if(!m.find()) {
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
@@ -109,7 +109,7 @@ public class CalculateSystem {
 				}
 
 				Pattern p = Pattern.compile("^\\w{8}$");  //半角英数かつ数値 8桁と一致
-		        Matcher m = p.matcher(item[0]);
+				Matcher m = p.matcher(item[0]);
 				if(!m.find()) {
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
@@ -241,8 +241,6 @@ public class CalculateSystem {
 				bwbranch.write(s.getKey() + "," + store.get(s.getKey()) + "," + s.getValue());
 				bwbranch.newLine();
 			}
-//			bwbranch.close();
-//			fw.close();
 		} catch (IOException e) {
 			System.out.println("予期せぬエラーが発生しました");
 			return;
