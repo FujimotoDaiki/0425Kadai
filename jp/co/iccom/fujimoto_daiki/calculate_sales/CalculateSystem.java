@@ -29,7 +29,7 @@ public class CalculateSystem {
 
 		HashMap<String, Long> brasum = new HashMap<String, Long>(); //マップオブジェクト生成
 		HashMap<String, Long> comsum = new HashMap<String, Long>(); //マップオブジェクト生成
-//1.支店定義ファイル読み込み
+		//1.支店定義ファイル読み込み
 		HashMap<String, String> store = new HashMap<String, String>(); //マップオブジェクト生成(名前)
 		FileReader frstore = null;
 		BufferedReader brstore = null;
@@ -85,7 +85,7 @@ public class CalculateSystem {
 		}
 		System.out.println();
 
-//2.商品定義ファイル
+		//2.商品定義ファイル
 		HashMap<String, String> products = new HashMap<String, String>(); //マップオブジェクト生成
 		FileReader frproducts = null;
 		BufferedReader brproducts = null;
@@ -139,7 +139,7 @@ public class CalculateSystem {
 			}
 		}
 
-//3.集計
+		//3.集計
 		File file = new File(args[0]);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
@@ -220,8 +220,8 @@ public class CalculateSystem {
 			}
 		}
 
-//4.集計結果出力
-	//支店別集計ファイル
+		//4.集計結果出力
+		//支店別集計ファイル
 		File branch = new File(args[0],"\\branch.out");
 		BufferedWriter bwbranch = null;
 		try {
@@ -256,7 +256,7 @@ public class CalculateSystem {
 			}
 		}
 
-	//商品別集計ファイル
+		//商品別集計ファイル
 		File commodity = new File(args[0], "\\commodity.out"); //名前をつけファイルを作成
 		BufferedWriter bwcommodity = null;
 		try {
