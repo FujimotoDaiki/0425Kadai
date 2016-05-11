@@ -30,7 +30,6 @@ public class CalculateSystem {
 		HashMap<String, Long> brasum = new HashMap<String, Long>(); //マップオブジェクト生成
 		HashMap<String, Long> comsum = new HashMap<String, Long>(); //マップオブジェクト生成
 //1.支店定義ファイル読み込み
-		//if(args.length != 1)
 		HashMap<String, String> store = new HashMap<String, String>(); //マップオブジェクト生成(名前)
 		FileReader frstore = null;
 		BufferedReader brstore = null;
@@ -43,18 +42,14 @@ public class CalculateSystem {
 
 			while ((line = brstore.readLine()) != null) {  //文字列データの受け取り
 				String[] items = line.split(",", -1);  //カンマで分ける
-//				System.out.println(items[0]);
 				store.put(items[0], items[1]);  //items[0]支店コードをキーに, items[1]支店名、を格納
 				brasum.put(items[0], 0L);
-//				System.out.println(store.get(items[0]));
-//				System.out.println(brasum.get(items[0]));
 
 				for(int i =0; i < items.length; i++) {
 					if(!(items.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
 						System.out.println("支店定義ファイルのフォーマットが不正です");
 						return;
 					}
-//					System.out.println(items[0] + "," + items[1]);
 				}
 				String str = items[0];
 
@@ -65,8 +60,6 @@ public class CalculateSystem {
 					return;
 				}
 			}
-			//brstore.close();
-//			frstore.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("支店定義ファイルが存在しません");
 		} catch(IOException e) {
@@ -90,7 +83,6 @@ public class CalculateSystem {
 				return;
 			}
 		}
-
 		System.out.println();
 
 //2.商品定義ファイル
@@ -114,8 +106,6 @@ public class CalculateSystem {
 						System.out.println("商品定義ファイルのフォーマットが不正です");
 						return;
 					}
-//					System.out.println(item[0] + "," + item[1]);
-//					System.out.println(products.get(item[0]));
 				}
 
 				Pattern p = Pattern.compile("^\\w{8}$");  //半角英数かつ数値 8桁と一致
@@ -125,8 +115,6 @@ public class CalculateSystem {
 					return;
 				}
 			}
-//			brproducts.close();
-//			frproducts.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("商品定義ファイルが存在しません");
 		} catch (IOException e) {
@@ -162,9 +150,7 @@ public class CalculateSystem {
 
 				int j = Integer.parseInt(item[0]);  //文字列を数値に変換
 
-				if(j - 1 == i) {
-//				System.out.println(j);
-				} else {
+				if(!(j - 1 == i)) {
 					System.out.println("売上ファイル名が連番になっていません");
 					return;
 				}
@@ -177,15 +163,13 @@ public class CalculateSystem {
 				File String = new File(sum.get(k).toString());
 				FileReader filereader = new FileReader(String);
 				brsum = new BufferedReader(filereader);
+
 				String line;
 
 				ArrayList<String> contents = new ArrayList<String>(); //リストに、rcdファイルのみを格納
 				while ((line = brsum.readLine()) != null) {  //文字列データの受け取り
 					contents.add(line);
 				}
-//				System.out.println(contents.get(0)); //支店コード
-//				System.out.println(contents.get(1)); //商品コード
-//				System.out.println(contents.get(2)); //売上額
 
 				if(!store.containsKey(contents.get(0))) { //storeマップにリスト「contents」と同じキーが含まれているか
 					System.out.println("<該当ファイル名>の支店コードが不正です"); //falseなら左文章を表示
@@ -205,8 +189,6 @@ public class CalculateSystem {
 				long sale = Long.parseLong(contents.get(2)); //売上げ額をLong型の数値に
 				long shop = brasum.get(contents.get(0)); //支店コードをgetする
 				long code = comsum.get(contents.get(1)); //商品コードをgetする
-//				System.out.println(contents.get(0));
-//				System.out.println(sale + shop);
 
 				brasum.put(contents.get(0), sale + shop); //支店ごとの売上合計をマップにいれる
 				comsum.put(contents.get(1), sale + code); //商品ごとの売上合計をマップに入れる
@@ -219,9 +201,6 @@ public class CalculateSystem {
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
-
-//				brsum.close();
-//				filereader.close();
 			}
 		} catch (FileNotFoundException e) {
 				System.out.println("商品定義ファイルが存在しません");
@@ -299,8 +278,6 @@ public class CalculateSystem {
 				bwcommodity.write(t.getKey() + "," + products.get(t.getKey()) + "," + t.getValue()); //ファイルに書き込む
 				bwcommodity.newLine();
 			}
-//			bwcommodity.close();
-//			fw.close();
 		} catch(IOException e) {
 			System.out.println("予期せぬエラーが発生しました");
 			return;
