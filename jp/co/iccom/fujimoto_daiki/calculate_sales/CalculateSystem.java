@@ -130,33 +130,32 @@ public class CalculateSystem {
 		}
 
 		//3.集計
-		File file = new File(args[0]);
+		File file = new File(args[0] + File.separator);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
-		ArrayList<File> sum = new ArrayList<File>();
+		ArrayList<File> rcdFile = new ArrayList<File>();
 		for(int i = 0; i < files.length; i++) {
-			if(files[i].getName().endsWith(".rcd")) {  //接尾語が.rcdと一致
+
+			String str = files[i].getName();
+
+			if(str.matches("^\\d{8}.rcd$")) {  //接尾語が.rcdと一致
 				if(files[i].isFile()) {
-					String[] item = files[i].getName().toString().split("\\.", -1);  //[C:\Kadai]の表示なし、文字列を.で区切る
-					int j = Integer.parseInt(item[0]);  //文字列を数値に変換
-
-					if(!(j - 1 == i)) {
-						System.out.println("売上ファイル名が連番になっていません");
-						return;
-					}
-
-//				if(!item[0].matches("^\\w{8}$")) { //.rcd前のファイル名が8桁以外の時、メッセージを表示
-//					System.out.println("売上ファイル名が連番になっていません");
-//					return;
-//				}
-
-					sum.add(files[i]);
+					rcdFile.add(files[i]);
 				}
 			}
 		}
+		for(int i = 0; i < rcdFile.size(); i++) {
+			String[] item = files[i].getName().toString().split("\\.", -1);  //[C:\Kadai]の表示なし、文字列を.で区切る
+			int j = Integer.parseInt(item[0]);  //文字列を数値に変換
+			if(j - 1 != i) {
+				System.out.println("売上ファイル名が連番になっていません");
+				return;
+			}
+		}
+
 		try {
-			for(int k = 0; k < sum.size(); k++) {
-				File String = new File(sum.get(k).toString());
+			for(int i = 0; i < rcdFile.size(); i++) {
+				File String = new File(rcdFile.get(i).toString());
 				FileReader filereader = new FileReader(String);
 				br = new BufferedReader(filereader);
 
@@ -168,25 +167,20 @@ public class CalculateSystem {
 				}
 
 				if(!(contents.size() == 3)) { //要素数が3と同じではない場合のみ、以下のメッセージを表示
-					System.out.println(sum.get(k).getName() + "のフォーマットが不正です");
+					System.out.println(rcdFile.get(i).getName() + "のフォーマットが不正です");
 					return;
 				}
 
 				if(!branch.containsKey(contents.get(0))) { //storeマップにリスト「contents」と同じキーが含まれているか
-					System.out.println(sum.get(k).getName() + "の支店コードが不正です"); //falseなら左文章を表示
+					System.out.println(rcdFile.get(i).getName() + "の支店コードが不正です"); //falseなら左文章を表示
 					//.getNameを使う
 					return;
 				}
 
 				if(!commodity.containsKey(contents.get(1))) {
-					System.out.println(sum.get(k).getName() + "の商品コードが不正です");
+					System.out.println(rcdFile.get(i).getName() + "の商品コードが不正です");
 					return;
 				}
-
-//				if(!(contents.size() == 3)) { //要素数が3と同じではない場合のみ、以下のメッセージを表示
-//					System.out.println(sum.get(k).getName() + "のフォーマットが不正です");
-//					return;
-//				}
 
 				long sale = Long.parseLong(contents.get(2)); //売上げ額をLong型の数値に
 				long shop = branchsum.get(contents.get(0)); //支店コードをgetする
