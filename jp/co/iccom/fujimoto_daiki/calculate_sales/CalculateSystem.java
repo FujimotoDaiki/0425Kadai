@@ -23,6 +23,10 @@ public class CalculateSystem {
 			return;
 		}
 
+		if(args[0].endsWith(java.io.File.pathSeparator)) {
+			System.exit(0);
+		}
+
 		HashMap<String, Long> branchsum = new HashMap<String, Long>(); //マップオブジェクト生成
 		HashMap<String, Long> commoditysum = new HashMap<String, Long>(); //マップオブジェクト生成
 		//1.支店定義ファイル読み込み
@@ -38,25 +42,23 @@ public class CalculateSystem {
 
 			while ((line = br.readLine()) != null) {  //文字列データの受け取り
 				String[] items = line.split(",", -1);  //カンマで分ける
-				branch.put(items[0], items[1]);  //items[0]支店コードをキーに, items[1]支店名、を格納
-				branchsum.put(items[0], 0L);
 
-				for(int i =0; i < items.length; i++) {
-					if(!(items.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
-						System.out.println("支店定義ファイルのフォーマットが不正です");
-						return;
-					}
-				}
-
-				if(!items[0].matches("^\\d{3}$")) {
+				if(!(items.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
 				}
+
+				if(!items[0].matches("^\\d{3}$")) { //支店コードが三桁ではない場合のみ、メッセージを表示
+					System.out.println("支店定義ファイルのフォーマットが不正です");
+					return;
+				}
+				branch.put(items[0], items[1]);  //items[0]支店コードをキーに, items[1]支店名、を格納
+				branchsum.put(items[0], 0L);
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("支店定義ファイルが存在しません");
 		} catch(IOException e) {
-			System.out.println(e);
+			System.out.println("支店定義ファイルが存在しません");
 		}
 		finally {
 			try {
@@ -89,8 +91,6 @@ public class CalculateSystem {
 			while ((line = br.readLine()) != null) {  //文字列データの受け取り
 				String[] item = line.split(",", -1);  //カンマで分ける
 
-				commodity.put(item[0], item[1]);  //item[0]商品コード, item[1]商品名、を格納
-				commoditysum.put(item[0], 0L);
 				for(int i =0; i < item.length; i++) {
 					if(!(item.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
 						System.out.println("商品定義ファイルのフォーマットが不正です");
@@ -98,15 +98,17 @@ public class CalculateSystem {
 					}
 				}
 
-				if(!item[0].matches("^\\w{8}$")) {
+				if(!item[0].matches("^\\w{8}$")) { //商品コードが8桁以外の時、メッセージを表示
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
 				}
+				commodity.put(item[0], item[1]);  //item[0]商品コード, item[1]商品名、を格納
+				commoditysum.put(item[0], 0L);
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("商品定義ファイルが存在しません");
 		} catch (IOException e) {
-			System.out.println("商品定義ファイルのフォーマットが不正です");
+			System.out.println("商品定義ファイルが存在しません");
 		}
 		finally {
 			try {
@@ -142,10 +144,16 @@ public class CalculateSystem {
 					System.out.println("売上ファイル名が連番になっていません");
 					return;
 				}
+
+				if(!item[0].matches("^\\w{8}$")) { //.rcd前のファイル名が8桁以外の時、メッセージを表示
+					System.out.println("売上ファイル名が連番になっていません");
+					return;
+				}
+
 				sum.add(files[i]);
 			}
 		}
-//		BufferedReader brsum = null;
+		//BufferedReader brsum = null;
 		try {
 			for(int k = 0; k < sum.size(); k++) {
 				File String = new File(sum.get(k).toString());
@@ -160,17 +168,18 @@ public class CalculateSystem {
 				}
 
 				if(!branch.containsKey(contents.get(0))) { //storeマップにリスト「contents」と同じキーが含まれているか
-					System.out.println("<該当ファイル名>の支店コードが不正です"); //falseなら左文章を表示
+					System.out.println(sum.get(k).getName() + "の支店コードが不正です"); //falseなら左文章を表示
+					//.getNameを使う
 					return;
 				}
 
 				if(!commodity.containsKey(contents.get(1))) {
-					System.out.println("<該当ファイル名>の商品コードが不正です");
+					System.out.println(sum.get(k).getName() + "の商品コードが不正です");
 					return;
 				}
 
 				if(!(contents.size() == 3)) { //要素数が3と同じではない場合のみ、以下のメッセージを表示
-					System.out.println("＜該当ファイル名＞のフォーマットが不正です");
+					System.out.println(sum.get(k).getName() + "のフォーマットが不正です");
 					return;
 				}
 
@@ -183,7 +192,7 @@ public class CalculateSystem {
 
 				String str = Long.toString(sale + shop);
 
-				if(!str.matches("^\\d{1,10}$")) {
+				if(!str.matches("^\\d{1,10}$")) { //合計金額が1～10桁ではない場合
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
@@ -208,7 +217,7 @@ public class CalculateSystem {
 
 		//4.集計結果出力
 		//支店別集計ファイル
-		File file1 = new File(args[0],"\\branch.out");
+		File file1 = new File(args[0] + File.separator + "branch.out");
 		BufferedWriter bw = null;
 		try {
 			FileWriter fw = new FileWriter(file1);
@@ -243,7 +252,7 @@ public class CalculateSystem {
 		}
 
 		//商品別集計ファイル
-		File file2 = new File(args[0], "\\commodity.out"); //名前をつけファイルを作成
+		File file2 = new File(args[0] + File.separator + "commodity.out"); //名前をつけファイルを作成
 		try {
 			FileWriter fw = new FileWriter(file2);
 			bw = new BufferedWriter(fw);
