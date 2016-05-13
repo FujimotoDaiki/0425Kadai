@@ -25,12 +25,41 @@ public class CalculateSystem {
 
 		HashMap<String, Long> branchSumMap = new HashMap<String, Long>(); //マップオブジェクト生成
 		HashMap<String, Long> commoditySumMap = new HashMap<String, Long>(); //マップオブジェクト生成
+		
 		//1.支店定義ファイル読み込み
 		HashMap<String, String> branchDetailMap = new HashMap<String, String>(); //マップオブジェクト生成(名前)
+		
+		//2.商品定義ファイル
+		HashMap<String, String> commodityDetailMap = new HashMap<String, String>(); //マップオブジェクト生成
+		
+		//支店定義ファイルの読み込み
+		if(!fileReader(args[0], "branch.lst", "^\\d{3}$", "支店", branchDetailMap, branchSumMap)) {
+			return;
+		}
+		//商品定義ファイルの読み込み
+		if(!fileReader(args[0], "commodity.lst", "^\\w{8}$", "商品", commodityDetailMap, commoditySumMap)) {
+			return;
+		}
+		//加算処理
+		if(!(saleSum(args[0], branchSumMap, commoditySumMap))) {
+			return;
+		}
+		//支店別ファイル集計 fileWriterメソッド呼び出し
+		if(!fileWriter(args[0], "branch.out", branchDetailMap, branchSumMap)) {
+			return;
+		}
+		//商品別ファイル集計 fileWriterメソッド呼び出し
+		if(!fileWriter(args[0], "commodity.out", commodityDetailMap, commoditySumMap)) {
+			return;
+		}
+	}
+
+	//支店＆商品定義ファイルの読み込み
+	private static boolean fileReader(String path, String fileName, String expretion, String branch, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
 		FileReader fr = null;
 		BufferedReader br = null;
 		try {
-			File file = new File(args[0] + File.separator + "branch.lst");  //ファイル名を探す
+			File file = new File(path + File.separator + fileName);  //ファイル名を探す
 			fr = new FileReader(file);  //ファイルから文字列をバッファへ渡す
 			br = new BufferedReader(fr);  //文字列を蓄え、要求に応じて文字列を渡す
 
@@ -40,23 +69,23 @@ public class CalculateSystem {
 				String[] items = line.split(",", -1);  //カンマで分ける
 
 				if(!(items.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
-					System.out.println("支店定義ファイルのフォーマットが不正です");
-					return;
+					System.out.println(branch + "定義ファイルのフォーマットが不正です");
+					return false;
 				}
 
-				if(!items[0].matches("^\\d{3}$")) { //支店コードが三桁ではない場合のみ、メッセージを表示
-					System.out.println("支店定義ファイルのフォーマットが不正です");
-					return;
+				if(!items[0].matches(expretion)) { //支店コードが三桁ではない場合のみ、メッセージを表示
+					System.out.println(branch + "定義ファイルのフォーマットが不正です");
+					return false;
 				}
-				branchDetailMap.put(items[0], items[1]);  //items[0]支店コードをキーに, items[1]支店名、を格納
-				branchSumMap.put(items[0], 0L);
+				detailMap.put(items[0], items[1]);  //items[0]支店コードをキーに, items[1]支店名、を格納
+				sumMap.put(items[0], 0L);
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("支店定義ファイルが存在しません");
-			return;
+			System.out.println(branch + "定義ファイルが存在しません");
+			return false;
 		} catch(IOException e) {
-			System.out.println("支店定義ファイルが存在しません");
-			return;
+			System.out.println(branch + "定義ファイルが存在しません");
+			return false;
 		}
 		finally {
 			try {
@@ -65,7 +94,7 @@ public class CalculateSystem {
 				}
 			} catch(IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
-				return;
+				return false;
 			}
 			try {
 				if(fr != null) {
@@ -73,64 +102,15 @@ public class CalculateSystem {
 				}
 			} catch(IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
-				return;
+				return false;
 			}
 		}
+		return true;
+	}
 
-		//2.商品定義ファイル
-		HashMap<String, String> commodityDetailMap = new HashMap<String, String>(); //マップオブジェクト生成
-		try {
-			File file = new File(args[0] + File.separator + "commodity.lst");
-			fr = new FileReader(file);
-			br = new BufferedReader(fr);
-
-			String line;  //変数
-
-			while ((line = br.readLine()) != null) {  //文字列データの受け取り
-				String[] item = line.split(",", -1);  //カンマで分ける
-
-				for(int i =0; i < item.length; i++) {
-					if(!(item.length == 2)) { //要素数が2と同じではない場合のみ、以下のメッセージを表示
-						System.out.println("商品定義ファイルのフォーマットが不正です");
-						return;
-					}
-				}
-
-				if(!item[0].matches("^\\w{8}$")) { //商品コードが8桁以外の時、メッセージを表示
-					System.out.println("商品定義ファイルのフォーマットが不正です");
-					return;
-				}
-				commodityDetailMap.put(item[0], item[1]);  //item[0]商品コード, item[1]商品名、を格納
-				commoditySumMap.put(item[0], 0L);
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("商品定義ファイルが存在しません");
-			return;
-		} catch (IOException e) {
-			System.out.println("商品定義ファイルが存在しません");
-			return;
-		}
-		finally {
-			try {
-				if(fr != null) {
-					fr.close();
-				}
-			} catch(IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
-				return;
-			}
-			try {
-				if(br != null) {
-					br.close();
-				}
-			} catch(IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
-				return;
-			}
-		}
-
-		//3.集計
-		File file = new File(args[0] + File.separator);
+	//加算処理
+	private static boolean saleSum(String path, HashMap<String, Long> branchSumMap, HashMap<String, Long> commoditySumMap) {
+		File file = new File(path + File.separator);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
 		ArrayList<File> rcdList = new ArrayList<File>();
@@ -149,15 +129,16 @@ public class CalculateSystem {
 			int j = Integer.parseInt(item[0]);  //文字列を数値に変換
 			if(j - 1 != i) {
 				System.out.println("売上ファイル名が連番になっていません");
-				return;
+				return false;
 			}
 		}
-
+		FileReader fr = null;
+		BufferedReader br = null;
 		try {
 			for(int i = 0; i < rcdList.size(); i++) {
 				File String = new File(rcdList.get(i).toString());
-				FileReader filereader = new FileReader(String);
-				br = new BufferedReader(filereader);
+				fr = new FileReader(String);
+				br = new BufferedReader(fr);
 
 				String line;
 
@@ -168,18 +149,18 @@ public class CalculateSystem {
 
 				if(!(contents.size() == 3)) { //要素数が3と同じではない場合のみ、以下のメッセージを表示
 					System.out.println(rcdList.get(i).getName() + "のフォーマットが不正です");
-					return;
+					return false;
 				}
 
-				if(!branchDetailMap.containsKey(contents.get(0))) { //storeマップにリスト「contents」と同じキーが含まれているか
+				if(!branchSumMap.containsKey(contents.get(0))) { //storeマップにリスト「contents」と同じキーが含まれているか
 					System.out.println(rcdList.get(i).getName() + "の支店コードが不正です"); //falseなら左文章を表示
 					//.getNameを使う
-					return;
+					return false;
 				}
 
-				if(!commodityDetailMap.containsKey(contents.get(1))) {
+				if(!commoditySumMap.containsKey(contents.get(1))) {
 					System.out.println(rcdList.get(i).getName() + "の商品コードが不正です");
-					return;
+					return false;
 				}
 
 				long sale = Long.parseLong(contents.get(2)); //売上げ額をLong型の数値に
@@ -194,20 +175,20 @@ public class CalculateSystem {
 
 				if(!(strBranch.length() <= 10)) { //支店別の合計金額が1～10桁ではない場合
 					System.out.println("合計金額が10桁を超えました");
-					return;
+					return false;
 				}
 
 				if(!(strCommodity.length() <= 10)) { //商品別の合計金額が1～10桁ではない場合
 					System.out.println("合計金額が10桁を超えました");
-					return;
+					return false;
 				}
 			}
 		} catch (FileNotFoundException e) {
 				System.out.println("商品定義ファイルが存在しません");
-				return;
+				return false;
 		} catch (IOException e) {
 				System.out.println("商品定義ファイルのフォーマットが不正です");
-				return;
+				return false;
 		}
 		finally {
 			try {
@@ -216,34 +197,44 @@ public class CalculateSystem {
 				}
 			} catch(IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
-				return;
+				return false;
+			}
+			try {
+				if(fr != null) {
+					fr.close();
+				}
+			} catch(IOException e) {
+				System.out.println("予期せぬエラーが発生しました");
+				return false;
 			}
 		}
+		return true;
+	}
 
-		//4.集計結果出力
-		//支店別集計ファイル
-		File file1 = new File(args[0] + File.separator + "branch.out");
+	//支店＆商品別ファイル出力
+	private static boolean fileWriter(String path, String fileName, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
+		File file = new File(path + File.separator + fileName);
 		BufferedWriter bw = null;
 		try {
-			FileWriter fw = new FileWriter(file1);
+			FileWriter fw = new FileWriter(file);
 			bw = new BufferedWriter(fw);
 
-			List<Map.Entry<String, Long>> shopSum =
-					new ArrayList<Map.Entry<String, Long>>(branchSumMap.entrySet());// List生成、ソートここから
-			Collections.sort(shopSum, new Comparator<Map.Entry<String,Long>>() {
+			List<Map.Entry<String, Long>> listSum =
+					new ArrayList<Map.Entry<String, Long>>(sumMap.entrySet());// List生成、ソートここから
+			Collections.sort(listSum, new Comparator<Map.Entry<String,Long>>() {
 
 				@Override
 				public int compare(Entry<String,Long> entry1, Entry<String,Long> entry2) { //compareを使って比較
 					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
 				}
 			});
-			for(Entry<String, Long> s : shopSum) {
-				bw.write(s.getKey() + "," + branchDetailMap.get(s.getKey()) + "," + s.getValue());
+			for(Entry<String, Long> s : listSum) {
+				bw.write(s.getKey() + "," + detailMap.get(s.getKey()) + "," + s.getValue());
 				bw.newLine();
 			}
 		} catch (IOException e) {
 			System.out.println("予期せぬエラーが発生しました");
-			return;
+			return false;
 		}
 		finally {
 			try {
@@ -252,42 +243,9 @@ public class CalculateSystem {
 				}
 			} catch(IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
-				return;
+				return false;
 			}
 		}
-
-		//商品別集計ファイル
-		File file2 = new File(args[0] + File.separator + "commodity.out"); //名前をつけファイルを作成
-		try {
-			FileWriter fw = new FileWriter(file2);
-			bw = new BufferedWriter(fw);
-
-			List<Map.Entry<String, Long>> codeSum =
-					new ArrayList<Map.Entry<String, Long>>(commoditySumMap.entrySet());// List生成、ソートここから
-			Collections.sort(codeSum, new Comparator<Map.Entry<String,Long>>() {
-
-				@Override
-				public int compare(Entry<String,Long> entry1, Entry<String,Long> entry2) { //compareを使って比較
-					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
-				}
-			});
-			for(Entry<String, Long> t : codeSum) {
-				bw.write(t.getKey() + "," + commodityDetailMap.get(t.getKey()) + "," + t.getValue()); //ファイルに書き込む
-				bw.newLine();
-			}
-		} catch(IOException e) {
-			System.out.println("予期せぬエラーが発生しました");
-			return;
-		}
-		finally {
-			try {
-				if(bw != null) {
-					bw.close();
-				}
-			} catch(IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
-				return;
-			}
-		}
+		return true;
 	}
 }
