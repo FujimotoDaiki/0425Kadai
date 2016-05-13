@@ -191,7 +191,7 @@ public class CalculateSystem {
 
 				String str = Long.toString(sale + shop);
 
-				if(!str.matches("^\\d{1,10}$")) { //合計金額が1～10桁ではない場合
+				if(!(str.length() <= 10)) { //合計金額が1～10桁ではない場合
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
