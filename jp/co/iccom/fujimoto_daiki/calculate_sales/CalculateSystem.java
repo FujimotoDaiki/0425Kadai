@@ -189,9 +189,15 @@ public class CalculateSystem {
 				branchsum.put(contents.get(0), sale + shop); //支店ごとの売上合計をマップにいれる
 				commoditysum.put(contents.get(1), sale + code); //商品ごとの売上合計をマップに入れる
 
-				String str = Long.toString(sale + shop);
+				String strshop = Long.toString(sale + shop);
+				String strcode = Long.toString(sale + code);
 
-				if(!(str.length() <= 10)) { //合計金額が1～10桁ではない場合
+				if(!(strshop.length() <= 10)) { //支店別の合計金額が1～10桁ではない場合
+					System.out.println("合計金額が10桁を超えました");
+					return;
+				}
+
+				if(!(strcode.length() <= 10)) { //商品別の合計金額が1～10桁ではない場合
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
