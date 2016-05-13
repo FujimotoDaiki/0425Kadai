@@ -145,7 +145,7 @@ public class CalculateSystem {
 			}
 		}
 		for(int i = 0; i < rcdFile.size(); i++) {
-			String[] item = files[i].getName().toString().split("\\.", -1);  //[C:\Kadai]の表示なし、文字列を.で区切る
+			String[] item = rcdFile.get(i).getName().toString().split("\\.", -1);  //[C:\Kadai]の表示なし、文字列を.で区切る
 			int j = Integer.parseInt(item[0]);  //文字列を数値に変換
 			if(j - 1 != i) {
 				System.out.println("売上ファイル名が連番になっていません");
