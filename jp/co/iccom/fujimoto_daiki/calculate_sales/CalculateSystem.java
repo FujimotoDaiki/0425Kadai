@@ -25,43 +25,40 @@ public class CalculateSystem {
 
 		HashMap<String, Long> branchSumMap = new HashMap<String, Long>(); //マップオブジェクト生成
 		HashMap<String, Long> commoditySumMap = new HashMap<String, Long>(); //マップオブジェクト生成
-		
-		//1.支店定義ファイル読み込み
+
+		//1.支店定義ファイル
 		HashMap<String, String> branchDetailMap = new HashMap<String, String>(); //マップオブジェクト生成(名前)
-		
+
 		//2.商品定義ファイル
 		HashMap<String, String> commodityDetailMap = new HashMap<String, String>(); //マップオブジェクト生成
-		
+
 		//支店定義ファイルの読み込み
-		if(!fileReader(args[0], "branch.lst", "^\\d{3}$", "支店", branchDetailMap, branchSumMap)) {
+		if(!output(args[0] + File.separator + "branch.lst", "^\\d{3}$", "支店", branchDetailMap, branchSumMap)) {
 			return;
 		}
 		//商品定義ファイルの読み込み
-		if(!fileReader(args[0], "commodity.lst", "^\\w{8}$", "商品", commodityDetailMap, commoditySumMap)) {
+		if(!output(args[0] + File.separator + "commodity.lst", "^\\w{8}$", "商品", commodityDetailMap, commoditySumMap)) {
 			return;
 		}
 		//加算処理
-		if(!(saleSum(args[0], branchSumMap, commoditySumMap))) {
+		if(!(addition(args[0] + File.separator, branchSumMap, commoditySumMap))) {
 			return;
 		}
 		//支店別ファイル集計 fileWriterメソッド呼び出し
-		if(!fileWriter(args[0], "branch.out", branchDetailMap, branchSumMap)) {
+		if(!input(args[0] + File.separator + "branch.out", branchDetailMap, branchSumMap)) {
 			return;
 		}
 		//商品別ファイル集計 fileWriterメソッド呼び出し
-		if(!fileWriter(args[0], "commodity.out", commodityDetailMap, commoditySumMap)) {
+		if(!input(args[0] + File.separator + "commodity.out", commodityDetailMap, commoditySumMap)) {
 			return;
 		}
 	}
 
 	//支店＆商品定義ファイルの読み込み
-	private static boolean fileReader(String path, String fileName, String expretion, String branch, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
-		FileReader fr = null;
+	private static boolean output(String fileName, String expretion, String branch, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
 		BufferedReader br = null;
 		try {
-			File file = new File(path + File.separator + fileName);  //ファイル名を探す
-			fr = new FileReader(file);  //ファイルから文字列をバッファへ渡す
-			br = new BufferedReader(fr);  //文字列を蓄え、要求に応じて文字列を渡す
+			br = new BufferedReader(new FileReader(new File(fileName)));
 
 			String line;  //変数
 
@@ -96,21 +93,13 @@ public class CalculateSystem {
 				System.out.println("予期せぬエラーが発生しました");
 				return false;
 			}
-			try {
-				if(fr != null) {
-					fr.close();
-				}
-			} catch(IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
-				return false;
-			}
 		}
 		return true;
 	}
 
 	//加算処理
-	private static boolean saleSum(String path, HashMap<String, Long> branchSumMap, HashMap<String, Long> commoditySumMap) {
-		File file = new File(path + File.separator);
+	private static boolean addition(String path, HashMap<String, Long> branchSumMap, HashMap<String, Long> commoditySumMap) {
+		File file = new File(path);
 		File files[] = file.listFiles();  //ファイルの一覧をFile型の配列で返す
 
 		ArrayList<File> rcdList = new ArrayList<File>();
@@ -132,13 +121,10 @@ public class CalculateSystem {
 				return false;
 			}
 		}
-		FileReader fr = null;
 		BufferedReader br = null;
 		try {
 			for(int i = 0; i < rcdList.size(); i++) {
-				File String = new File(rcdList.get(i).toString());
-				fr = new FileReader(String);
-				br = new BufferedReader(fr);
+				br = new BufferedReader(new FileReader(new File(rcdList.get(i).toString())));
 
 				String line;
 
@@ -199,25 +185,15 @@ public class CalculateSystem {
 				System.out.println("予期せぬエラーが発生しました");
 				return false;
 			}
-			try {
-				if(fr != null) {
-					fr.close();
-				}
-			} catch(IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
-				return false;
-			}
 		}
 		return true;
 	}
 
 	//支店＆商品別ファイル出力
-	private static boolean fileWriter(String path, String fileName, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
-		File file = new File(path + File.separator + fileName);
+	private static boolean input(String fileName, HashMap<String, String> detailMap, HashMap<String, Long> sumMap) {
 		BufferedWriter bw = null;
 		try {
-			FileWriter fw = new FileWriter(file);
-			bw = new BufferedWriter(fw);
+			bw = new BufferedWriter(new FileWriter(new File(fileName)));
 
 			List<Map.Entry<String, Long>> listSum =
 					new ArrayList<Map.Entry<String, Long>>(sumMap.entrySet());// List生成、ソートここから
